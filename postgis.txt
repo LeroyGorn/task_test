@@ -1,0 +1,53 @@
+CREATE EXTENSION postgis;
+
+
+-- Создание таблицы "Здания"
+CREATE TABLE Buildings (
+  uid VARCHAR(10) PRIMARY KEY,
+  floors INT,
+  coordinates GEOMETRY(Point, 4326)
+);
+
+-- Вставка данных
+INSERT INTO Buildings (uid, floors, coordinates)
+VALUES
+  ('DB0001', 5, ST_SetSRID(ST_MakePoint(-0.199624286154122, 51.519470704814033), 4326)),
+  ('DB0002', 2, ST_SetSRID(ST_MakePoint(-0.164514085183909, 51.535044799928521), 4326)),
+  ('DB0003', 5, ST_SetSRID(ST_MakePoint(-0.138361384233426, 51.540964543873187), 4326)),
+  ('DB0004', 7, ST_SetSRID(ST_MakePoint(-0.092614151989766, 51.516235799771131), 4326)),
+  ('DB0005', 3, ST_SetSRID(ST_MakePoint(-0.103091227905709, 51.504538456851705), 4326)),
+  ('DB0006', 4, ST_SetSRID(ST_MakePoint(-0.111648839531708, 51.504837149778091), 4326)),
+  ('DB0007', 5, ST_SetSRID(ST_MakePoint(-0.12148609401767, 51.488953927237603), 4326)),
+  ('DB0008', 7, ST_SetSRID(ST_MakePoint(-0.154116986946714, 51.482628972180535), 4326)),
+  ('DB0009', 3, ST_SetSRID(ST_MakePoint(-0.161235000355256, 51.481732450871306), 4326)),
+  ('DB0010', 6, ST_SetSRID(ST_MakePoint(-0.198824509366654, 51.518425606770265), 4326));
+
+1 - Расстояние между зданиями в метрах.
+
+SELECT
+  b1.uid AS building_uid1,
+  b2.uid AS building_uid2,
+  ST_DistanceSphere(b1.coordinates, b2.coordinates) AS distance_meters
+FROM
+  Buildings b1
+CROSS JOIN
+  Buildings b2
+WHERE
+  b1.uid <> b2.uid;
+
+2 - Найти для каждого здания ближайшие здания расположенные в радиусе 200м
+
+SELECT
+  b1.uid AS building_uid,
+  b2.uid AS nearest_building_uid,
+  ST_DistanceSphere(b1.coordinates, b2.coordinates) AS distance_meters
+FROM
+  Buildings b1
+JOIN
+  Buildings b2 ON b1.uid <> b2.uid
+WHERE
+  ST_DistanceSphere(b1.coordinates, b2.coordinates) <= 200;
+
+"DB0001"	"DB0010"	128.71286083
+"DB0010"	"DB0001"	128.71286083
+

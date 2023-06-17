@@ -1,0 +1,97 @@
+-- Таблица "Заказы"
+CREATE TABLE Orders (
+  order_id SERIAL PRIMARY KEY,
+  user_id INT,
+  FOREIGN KEY (user_id) REFERENCES Users (user_id)
+);
+
+-- Таблица "Продукты"
+CREATE TABLE Products (
+  product_id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  description VARCHAR(255),
+  price DECIMAL(10, 2)
+);
+
+-- Промежуточная таблица "Заказанные продукты"
+CREATE TABLE OrderedProducts (
+  order_id INT,
+  product_id INT,
+  FOREIGN KEY (order_id) REFERENCES Orders (order_id),
+  FOREIGN KEY (product_id) REFERENCES Products (product_id),
+  PRIMARY KEY (order_id, product_id)
+);
+
+-- Таблица "Пользователи"
+CREATE TABLE Users (
+  user_id SERIAL PRIMARY KEY,
+  full_name VARCHAR(255),
+  email VARCHAR(255)
+);
+
+
+-- Наполнение данных
+INSERT INTO OrderedProducts (order_id, product_id)
+VALUES
+  (1, 1),
+  (1, 2),
+  (2, 3);
+
+INSERT INTO Orders (user_id)
+VALUES (1), (2), (3);
+
+INSERT INTO Users (full_name, email)
+VALUES
+  ('John Doe', 'john@example.com'),
+  ('Jane Smith', 'jane@example.com'),
+  ('Mike Johnson', 'mike@example.com');
+
+INSERT INTO Products (name, description, price)
+VALUES
+  ('Product 1', 'Description 1', 10.99),
+  ('Product 2', 'Description 2', 15.99),
+  ('Product 3', 'Description 3', 9.99);
+ 
+ 
+1 - Всех пользователей у которых есть заказы.
+
+
+SELECT Users.full_name
+FROM Users
+INNER JOIN Orders ON Users.user_id = Orders.user_id;
+
+2 - Всех пользователей у которых нет заказов.
+
+SELECT Users.full_name
+FROM Users
+LEFT JOIN Orders ON Users.user_id = Orders.user_id
+WHERE Orders.order_id IS NULL;
+
+3 - Список заказов каждого пользователя
+
+SELECT Users.full_name, Orders.order_id
+FROM Users
+LEFT JOIN Orders ON Users.user_id = Orders.user_id;
+
+4 - 5 пользователей с самой большой суммой заказов
+
+SELECT Users.full_name, SUM(Products.price) AS total_amount
+FROM Users
+JOIN Orders ON Users.user_id = Orders.user_id
+JOIN OrderedProducts ON Orders.order_id = OrderedProducts.order_id
+JOIN Products ON OrderedProducts.product_id = Products.product_id
+GROUP BY Users.user_id
+ORDER BY total_amount DESC
+LIMIT 5;
+
+5 - Товары которые не были заказаны
+
+SELECT Products.*
+FROM Products
+LEFT JOIN OrderedProducts ON Products.product_id = OrderedProducts.product_id
+WHERE OrderedProducts.order_id IS NULL;
+
+
+
+
+
