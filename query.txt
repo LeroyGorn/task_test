@@ -60,6 +60,13 @@ SELECT Users.full_name
 FROM Users
 INNER JOIN Orders ON Users.user_id = Orders.user_id;
 
+
+"full_name"
+"John Doe"
+"Jane Smith"
+"Mike Johnson"
+
+
 2 - Всех пользователей у которых нет заказов.
 
 SELECT Users.full_name
@@ -67,11 +74,25 @@ FROM Users
 LEFT JOIN Orders ON Users.user_id = Orders.user_id
 WHERE Orders.order_id IS NULL;
 
+
+"full_name"
+"Mic Gorn"
+
+
 3 - Список заказов каждого пользователя
 
 SELECT Users.full_name, Orders.order_id
 FROM Users
 LEFT JOIN Orders ON Users.user_id = Orders.user_id;
+
+
+"full_name"	"order_id"
+"John Doe"	1
+"Jane Smith"	2
+"Mike Johnson"	3
+"Mic Gorn"	null
+
+
 
 4 - 5 пользователей с самой большой суммой заказов
 
@@ -84,12 +105,22 @@ GROUP BY Users.user_id
 ORDER BY total_amount DESC
 LIMIT 5;
 
+
+"full_name"	"total_amount"
+"John Doe"	26.98
+"Mike Johnson"	10.99
+"Jane Smith"	9.99
+
+
 5 - Товары которые не были заказаны
 
 SELECT Products.*
 FROM Products
 LEFT JOIN OrderedProducts ON Products.product_id = OrderedProducts.product_id
 WHERE OrderedProducts.order_id IS NULL;
+
+
+4	"Product 3"	"Description 3"	1199.00
 
 
 

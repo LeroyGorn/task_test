@@ -48,10 +48,14 @@ class NewsParser:
 
         text = ' '.join(paragraphs)
         text = re.sub(r'[^\w\s]', '', text)
+        words = text.split()
 
-        common_words.update(text.split())
+        excluded_words = {'a', 'an', 'the'}
+        filtered_words = [word for word in words if word.lower() not in excluded_words]
+        common_words.update(filtered_words)
         most_common = common_words.most_common(1)[0][0]
-        return {'words': sum(common_words.values()), 'common_words': most_common}
+
+        return {'words': len(words), 'common_words': most_common}
 
     def get_articles(self):
         domain = 'https://www.thenationalnews.com/'
